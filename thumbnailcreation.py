@@ -4,46 +4,81 @@ import datetime
 from datetime import timedelta
 
 locale.setlocale(locale.LC_TIME, "de_DE")
-YTWIDTH = 1280
-YTHEIGHT = 720
+
+
+class ThumbnailCreation:
+	YTWIDTH: int = 1280  # Standardwith of Thumbnail
+	YTHEIGHT: int = 720  # Standardheight of Thumbnail
+	picpath: str
+
+	def __init__(self, picpath):
+		self.picpath = picpath
+
+	def run(self, resize_ending=None):
+		self.resize_pics(resize_ending)
+
+	def resize_pics(self, pic_ending=None):
+		""" Resizes the pic for the youtube format and aligns it to center if it is too large.
+		The new pic is saved as self.picpath with an added 2. Optional you can give an ending
+		in the variable picending. In the end self.picpath becomes the new safepath.
+		"""
+		def scale(img, step):
+			""" Scales the with and height based on the step"""
+			width, height = img.size
+			while True:
+				width += step
+				height = img.height*width // img.width
+				if step < 0:
+					if width <= (self.YTWIDTH-step) or height <= (self.YTHEIGHT-step):
+						return width, height
+				else:
+					if width >= self.YTWIDTH and height >= self.YTHEIGHT:
+						return width, height
+		
+		img = Image.open(self.picpath)
+		picformat = img.format
+		# Check which side is longer and choose a step (up or down)
+		# else Statement if the YTWITH and YTHEIGHT is already good.
+		if img.width < self.YTWIDTH or img.height < self.YTHEIGHT:
+			newsize = scale(img, 1)
+
+		elif img.width > self.YTWIDTH or img.height > self.YTHEIGHT:
+			newsize = scale(img, -1)
+		
+		else: newsize = img.size
+
+		# Rezise Image and cut pic in center
+		img = img.resize(newsize, Image.LANCZOS)
+		pos1 = (img.width - self.YTWIDTH) / 2
+		pos2 = (img.height - self.YTHEIGHT) / 2
+		img = img.crop((pos1,pos2, self.YTWIDTH+pos1, self.YTHEIGHT+pos2))
+
+		# Build new Path and Safe new Pic, Set self.picpath
+		path = os.path.split(self.picpath)
+		ending = path[1].split(".")
+		
+		if pic_ending:
+			ending[1] = pic_ending
+		else:
+			ending[1] = picformat
+		
+		savepath = os.path.join(path[0], "1.".join(ending))
+		img.save(savepath, quality=100, format=ending[1])
+		self.picpath = savepath
+
 
 def Thumbnails(data, mainfolder, reuse):
 	if not reuse:
 		mainfolder = os.path.join(mainfolder, "live")
 		print("...Thumbnails werden erstellt")
-		resize_pics(mainfolder)
+		#resize_pics(mainfolder)
 		add_texts(data, mainfolder)
 		
 		check_size(mainfolder)
-		delete_not_needed(os.path.join(mainfolder, "Thumbnails"))
+		#delete_not_needed(os.path.join(mainfolder, "Thumbnails"))
 
 
-def resize_pics(path):
-	path = os.path.join(path, "Thumbnails")
-	
-	pics = [pic for pic in os.listdir(path) if "Folie" in pic]
 
-	for pic in pics:
-		img = Image.open(os.path.join(path, pic))
-		width, height = img.size
-		if img.size == (YTWIDTH, YTHEIGHT):
-			continue
-
-		if width < YTWIDTH or height < YTHEIGHT:
-			newsize = scale(img, width, height, 1)
-
-		elif width > YTWIDTH or height > YTHEIGHT:
-			newsize = scale(img, width, height, -1)
-
-		#print(newsize)
-		img = img.resize(newsize, Image.LANCZOS)
-
-
-		pos1 = (img.width - YTWIDTH) / 2
-		pos2 = (img.height - YTHEIGHT) / 2
-		img = img.crop((pos1,pos2, YTWIDTH+pos1, YTHEIGHT+pos2))
-
-		img.save(os.path.join(path, pic), quality=95)
 
 def add_texts(data, mainfolder):
 	path = os.path.join(mainfolder, "Thumbnails")
@@ -145,21 +180,14 @@ def check_size(path):
 				img.save(path, quality=quality)
 				quality -= 5
 
-def scale(img, width, height, step):
-    #print(f"Ausgangswert: {img.size}")
-    forrange = YTWIDTH if img.width < YTWIDTH else img.width
-    
-    for i in range(forrange + 10):
-        width += step
-        height = img.height * width // img.width
-        if step < 0:
-            if width <= (YTWIDTH +step) or height <= (YTHEIGHT +step):
-                return width, height
-        else:
-            if width >= YTWIDTH and height >= YTHEIGHT:
-                return width, height
-
 def delete_not_needed(path):
 	os.remove(os.path.join(path, "calibri.ttf"))
 	os.remove(os.path.join(path, "calibrib.ttf"))
 	os.remove(os.path.join(path, "logo.png"))
+
+def main() -> None:
+	thumbnail = ThumbnailCreation("example_low.jpg")
+	thumbnail.resize_pics("png")
+
+if __name__ == "__main__":
+	main()
