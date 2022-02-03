@@ -67,11 +67,11 @@ class ThumbnailCreation:
 		self.picpath = savepath
 
 
+
 def Thumbnails(data, mainfolder, reuse):
 	if not reuse:
 		mainfolder = os.path.join(mainfolder, "live")
 		print("...Thumbnails werden erstellt")
-		#resize_pics(mainfolder)
 		add_texts(data, mainfolder)
 		
 		check_size(mainfolder)
