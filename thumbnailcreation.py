@@ -205,12 +205,6 @@ def add_texts(data, mainfolder):
 
 	#Bild1
 	img = Image.open(os.path.join(path, pics[0]))
-	img = box_one(img, mainfolder)
-
-
-
-
-
 	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
 	date = date.strftime("%d. %B %H:%M Uhr")
 
@@ -219,7 +213,6 @@ def add_texts(data, mainfolder):
 
 	#Bild2
 	img = Image.open(os.path.join(path, pics[1]))
-	img = box_one(img, mainfolder)
 
 	minute = timedelta(minutes=15)
 	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
@@ -231,34 +224,12 @@ def add_texts(data, mainfolder):
 
 	#Bild3
 	img = Image.open(os.path.join(path, pics[2]))
-	img = box_one(img, mainfolder)
 
 	date = datetime.datetime.strptime(data["nextdate"], "%Y-%m-%d %H:%M")
 	date = date.strftime("%d. %B %H:%M Uhr")
 
 	img = box_two(img, ["Herzliche Einladung!", data["type"] + " am", date])
 	img.save(os.path.join(path, pics[2]), quality=95)
-
-#Obere Box
-def box_one(img, path):
-	#Rechteck
-	drawing = ImageDraw.Draw(img)
-	drawing.rounded_rectangle([(-20, 20), (540, 140)], radius=15, fill="#FFFFFF", outline=None, width=1)
-	#Logo
-	logo = Image.open(os.path.join(path, "Thumbnails", "logo.png"))
-	img.paste(logo, (20, 33))
-	
-	#Überschrift1
-	font = ImageFont.truetype("calibrib.ttf", 28)
-	drawing.text((130, 33), "Gemeinde Hamburg-Alstertal", font=font, fill="#000000")
-	#Überschrift2
-	font = ImageFont.truetype("calibrib.ttf", 28)
-	drawing.text((130, 78), "Neuapostolische Kirche", font=font, fill="#000000")
-	#Unterschrift
-	font = ImageFont.truetype("calibri.ttf", 28)
-	drawing.text((130, 106), "Nord- und Ostdeutschland", font=font, fill="#000000")
-
-	return img
 
 def box_two(img, data):
 	height = 200
@@ -322,9 +293,5 @@ def main() -> None:
 	#box1["line3_text"] = "Gemeinde Hamburg-Alstertal"
 	thumbnail.add_overlays(box1,{},{})
 
-def tests():
-	pass
-
 if __name__ == "__main__":
 	main()
-	#tests()
