@@ -1,4 +1,8 @@
+from ast import List
+from operator import truediv
 import os, locale
+from turtle import down
+from typing import Dict
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 from datetime import timedelta
@@ -10,6 +14,22 @@ class ThumbnailCreation:
 	YTWIDTH: int = 1280  # Standardwith of Thumbnail
 	YTHEIGHT: int = 720  # Standardheight of Thumbnail
 	picpath: str
+	upper_box_defaults: Dict = {
+		"activate": False,
+		"boxcolor": "#FFFFFF",
+		"boxside": "left",
+		"line1_color": "#000000",
+		"line1_font": "calibri",
+		"line1_text": "This is line 1 example",
+		"line2_color": "#000000",
+		"line2_font": "calibri",
+		"line2_text": "This is the example Seccond",
+		"line3_color": "#000000",
+		"line3_font": "calibri",
+		"line3_text": "This is an example",
+		"logostatus": False,
+		"logopath": None,
+	}
 
 	def __init__(self, picpath):
 		self.picpath = picpath
@@ -47,7 +67,7 @@ class ThumbnailCreation:
 		
 		else: newsize = img.size
 
-		# Rezise Image and cut pic in center
+		# Rezise Image and crop pic in center
 		img = img.resize(newsize, Image.LANCZOS)
 		pos1 = (img.width - self.YTWIDTH) / 2
 		pos2 = (img.height - self.YTHEIGHT) / 2
@@ -66,6 +86,103 @@ class ThumbnailCreation:
 		img.save(savepath, quality=100, format=ending[1])
 		self.picpath = savepath
 
+	def add_overlays(self, upper_data: Dict, picture_data: Dict, down_data: Dict) -> None:
+		""" Sets upper box, pic and bottom box"""
+		img = Image.open(self.picpath)
+		# Set upper Box
+		if upper_data["activate"]:
+			img = self.upper_box(img, upper_data)
+
+		# if picture_data["activate"]:
+		# 	img = self.add_picture(img, picture_data)
+
+		# if down_data["activate"]:
+		# 	img = self.down_box(img, down_data)
+
+		img.save(self.picpath, quality=100)
+
+
+	# HIER WEITER MACHEN!
+	def upper_box(self, img: Image, data: Dict) -> Image:
+		""" Draw upper Box with choosen data"""
+
+		line1_font = ImageFont.truetype(data["line1_font"], 28)
+		line1_size = line1_font.getsize(data["line1_text"])
+		line2_font = ImageFont.truetype(data["line2_font"], 28)
+		line2_size = line2_font.getsize(data["line2_text"])
+		line3_font = ImageFont.truetype(data["line3_font"], 28)
+		line3_size = line3_font.getsize(data["line3_text"])
+		max_linelen = max([line1_size[0], line2_size[0], line3_size[0]])
+
+		#Spaces outside the box
+		topspace = 20
+		middlespace = 20
+		borderspace = 20
+		
+		#margin inside the box
+		topmargin = 13
+		sidemargin = 20
+		bottommargin = 13
+		default_content = 94  # Default Content height without margin
+		if data["logostatus"]:
+			logo = Image.open(data["logopath"])
+			logospace = logo.width + 13
+			if logo.height > default_content:
+				default_content = logo.height
+		else: 
+			logo = None
+			logospace = 0
+
+		rectwidth = max_linelen + topspace + middlespace + logospace
+		rectheight = default_content + topmargin + bottommargin
+
+		# Boxposition on left
+		if data["boxside"] == "left":
+			x1 = 0-borderspace
+			y1 = topspace
+			x2 = rectwidth
+			y2 = topspace + rectheight
+			box_border_on_image = x1 + borderspace
+
+		# Boxposition on right
+		else:
+			x1 = img.width-rectwidth
+			y1 = topspace
+			x2 = img.width + borderspace
+			y2 = topspace + rectheight
+			box_border_on_image = x1
+			
+		#Rectangle
+		drawing = ImageDraw.Draw(img)
+		drawing.rounded_rectangle([(x1, y1), (x2, y2)], radius=15, fill=data["boxcolor"], outline=None, width=1)
+		#Draw Logo
+		if logo:
+			logo_x = box_border_on_image + sidemargin
+			if logo.height < default_content:
+				logo_y = round(topspace + topmargin + (default_content - logo.height) / 2)
+			else: logo_y = topspace+topmargin
+			img.paste(logo, (logo_x, logo_y))
+		
+		# Line1
+		line_x = box_border_on_image + sidemargin + logospace
+		line1_y = y1+topmargin
+		drawing.text((line_x, line1_y), data["line1_text"], font=line1_font, fill=data["line1_color"])
+
+		# Line 3
+		line3_y = y2 - bottommargin
+		drawing.text((line_x, line3_y), data["line3_text"], anchor="ls", font=line3_font, fill=data["line3_color"])
+
+		#drawing.line([(x2, y2-bottommargin), (x1, y2-bottommargin)], fill=128)
+		# Line2
+		drawing.text((line_x, y2-bottommargin - line1_font.getsize("o")[1]), data["line2_text"], anchor="lb", font=line2_font, fill=data["line2_color"])
+		
+		return img
+
+	def add_picture(self, img: Image, data: Dict) -> Image:
+		return img
+
+	def down_box(self, img: Image, data: Dict) -> Image:
+		return img
 
 
 def Thumbnails(data, mainfolder, reuse):
@@ -81,15 +198,20 @@ def Thumbnails(data, mainfolder, reuse):
 
 
 def add_texts(data, mainfolder):
+	#
 	path = os.path.join(mainfolder, "Thumbnails")
-
+	#
 	pics = [pic for pic in os.listdir(path) if "Folie" in pic]
 
 	#Bild1
 	img = Image.open(os.path.join(path, pics[0]))
 	img = box_one(img, mainfolder)
 
-	date = datetime.datetime.strptime(data['date'], "%Y-%m-%d %H:%M")
+
+
+
+
+	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
 	date = date.strftime("%d. %B %H:%M Uhr")
 
 	img = box_two(img, ["Herzliche Einladung!", data["type"] + " am", date])
@@ -100,7 +222,7 @@ def add_texts(data, mainfolder):
 	img = box_one(img, mainfolder)
 
 	minute = timedelta(minutes=15)
-	date = datetime.datetime.strptime(data['date'], "%Y-%m-%d %H:%M")
+	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
 	date = date - minute
 	date = date.strftime("%H:%M Uhr")
 
@@ -111,7 +233,7 @@ def add_texts(data, mainfolder):
 	img = Image.open(os.path.join(path, pics[2]))
 	img = box_one(img, mainfolder)
 
-	date = datetime.datetime.strptime(data['nextdate'], "%Y-%m-%d %H:%M")
+	date = datetime.datetime.strptime(data["nextdate"], "%Y-%m-%d %H:%M")
 	date = date.strftime("%d. %B %H:%M Uhr")
 
 	img = box_two(img, ["Herzliche Einladung!", data["type"] + " am", date])
@@ -189,5 +311,20 @@ def main() -> None:
 	thumbnail = ThumbnailCreation("example_low.jpg")
 	thumbnail.resize_pics("png")
 
+	box1 = thumbnail.upper_box_defaults
+	box1["activate"] = True
+	box1["logostatus"] = True
+	box1["logopath"] = os.path.join("examples", "logo3.jpg")
+	box1["line1_font"] = "calibrib"
+	box1["line2_font"] = "calibrib"
+	box1["line1_text"] = "Gemeinde Hamburg-Alstertal"
+	#box1["line2_text"] = "Gemeinde Hamburg-Alstertal"
+	#box1["line3_text"] = "Gemeinde Hamburg-Alstertal"
+	thumbnail.add_overlays(box1,{},{})
+
+def tests():
+	pass
+
 if __name__ == "__main__":
 	main()
+	#tests()
