@@ -35,9 +35,9 @@ class classicBoxTemplate(Template):
 		self.config["section_2"]["boxcolor"] = "#FFFFFF"
 		self.config["section_2"]["boxside"] = "right"
 		self.config["section_2"]["line1_color"]= "#000000"
-		self.config["section_2"]["line1_font"]= "calibrib"
+		self.config["section_2"]["line1_font"]= "calibri"
 		self.config["section_2"]["line2_color"]= "#000000"
-		self.config["section_2"]["line2_font"]= "calibri"
+		self.config["section_2"]["line2_font"]= "calibrib"
 		self.config["section_2"]["line3_color"]= "#000000"
 		self.config["section_2"]["line3_font"]= "calibrib"
 		#Spaces outside the box
@@ -46,12 +46,17 @@ class classicBoxTemplate(Template):
 		self.config["section_2"]["borderspace"] = 20
 		self.config["section_2"]["bottomspace"] = 75
 		#margin inside the box
-		self.config["section_2"]["topmargin"] = 13
-		self.config["section_2"]["sidemargin"] = 20
-		self.config["section_2"]["bottommargin"] = 13
+		self.config["section_2"]["topmargin"] = 15
+		self.config["section_2"]["sidemargin"] = 17
+		self.config["section_2"]["bottommargin"] = 20
 		# minimum width and height
-		self.config["section_2"]["default_content_height"] = 200  # Default Content height without margin
+		self.config["section_2"]["default_content_height"] = 166  # Default Content height without margin
 		self.config["section_2"]["default_box_width"] = 640
+		# Image 1
+		self.config["image_1"]["side"] = "right"
+		self.config["image_1"]["maximum_height"] = 150
+		self.config["image_1"]["topmargin"] = 20
+		self.config["image_1"]["sidemargin"] = 20
 		
 	def create_thumbnail(self, img: Image, data: Dict) -> Image:
 		# Set upper Box
@@ -62,7 +67,9 @@ class classicBoxTemplate(Template):
 			print("Section2")
 			img = self.down_box(img, data["section_2"])
 			
-			
+		if data["image_1"]["activate"]:
+			print("Image 1")
+			img = self.add_picture_1(img, data["image_1"])
 		return img
 
 	def upper_box(self, img: Image, data: Dict, logodata: Dict) -> Image:
@@ -134,6 +141,7 @@ class classicBoxTemplate(Template):
 		# Line2
 		drawing.text((line_x, y2-data["bottommargin"] - line1_font.getsize("o")[1]), data["line2_text"], anchor="lb", font=line2_font, fill=data["line2_color"])
 		
+		logo.close()
 		return img
 
 	def down_box(self, img: Image, data: Dict) -> Image:
@@ -181,44 +189,22 @@ class classicBoxTemplate(Template):
 		drawing.text((line_x, line3_y), data["line3_text"], anchor="ls", font=line3_font, fill=data["line3_color"])
 
 		# Line2
-		drawing.text((line_x, y2-data["bottommargin"] - line1_font.getsize("o")[1]), data["line2_text"], anchor="lb", font=line2_font, fill=data["line2_color"])
+		drawing.text((line_x, y2-data["bottommargin"] - line1_font.getsize("y2")[1]-14), data["line2_text"], anchor="lb", font=line2_font, fill=data["line2_color"])
 		
 		return img
 
 	def add_picture(self, img: Image, data: Dict) -> Image:
+		pic = Image.open(data["imagepath"])
+		if pic.height > data["maximum_height"]:
+			pic = help_shrink_image(999999, data["maximum_height"])
+
+		if data["side"] == "left":
+			x = data["sidemargin"]
+			y = data["topmargin"]
+		else:
+			x = img.width - pic.width - data["sidemargin"]
+			y = data["topmargin"]
+		img.paste(pic, (x, y))
+
+		pic.close()
 		return img
-
-def add_texts(data, mainfolder):
-	#
-	path = os.path.join(mainfolder, "Thumbnails")
-	#
-	pics = [pic for pic in os.listdir(path) if "Folie" in pic]
-
-	#Bild1
-	img = Image.open(os.path.join(path, pics[0]))
-	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
-	date = date.strftime("%d. %B %H:%M Uhr")
-
-	img = box_two(img, ["Herzliche Einladung!", data["type"] + " am", date])
-	img.save(os.path.join(path, pics[0]), quality=95)
-
-	#Bild2
-	img = Image.open(os.path.join(path, pics[1]))
-
-	minute = timedelta(minutes=15)
-	date = datetime.datetime.strptime(data["date"], "%Y-%m-%d %H:%M")
-	date = date - minute
-	date = date.strftime("%H:%M Uhr")
-
-	img = box_two(img, ["LIVE!\naus der Gemeinde\nab " + date])
-	img.save(os.path.join(path, pics[1]), quality=95)
-
-	#Bild3
-	img = Image.open(os.path.join(path, pics[2]))
-
-	date = datetime.datetime.strptime(data["nextdate"], "%Y-%m-%d %H:%M")
-	date = date.strftime("%d. %B %H:%M Uhr")
-
-	img = box_two(img, ["Herzliche Einladung!", data["type"] + " am", date])
-	img.save(os.path.join(path, pics[2]), quality=95)
-

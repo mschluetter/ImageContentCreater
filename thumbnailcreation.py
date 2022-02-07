@@ -114,6 +114,11 @@ def main() -> None:
 	config["section_1"]["activate"] = True
 	config["section_2"]["activate"] = True
 	#config["section_1"]["line1_text"] = "Gemeinde Hamburg-Alstertal"
+	config["section_2"]["line1_text"] = "Herzliche Einladung!"
+	config["section_2"]["line2_text"] = "Gottesdienst am"
+	config["section_2"]["line3_text"] = "03. September um 19:30 Uhr"
+	config["image_1"]["activate"] = True
+	config["image_1"]["imagepath"] = os.path.join("examples", "example_high.jpg")
 	thumbnail.add_overlays(config)
 
 def test():
@@ -142,6 +147,9 @@ def box_two(img, data):
 		font = ImageFont.truetype("calibrib.ttf", 55)
 		drawing.multiline_text((x1 + 17, y1 + 13 + 68), data[1] + "\n" + data[2], font=font, fill="#000000", spacing=15)
 
+		#font = ImageFont.truetype("calibrib.ttf", 55)
+		#drawing.text((x1 + 15, y1 + 13 + 58 + 58), data[2], font=font, fill="#000000")
+
 	else:
 		lines = data[0].split("\n")
 		font = ImageFont.truetype("calibrib.ttf", 55)
@@ -149,4 +157,5 @@ def box_two(img, data):
 
 		drawing.multiline_text((x1 + 17, y1 + 13 + 68), lines[1] + "\n" + lines[2], font=font, fill="#000000", spacing=15)
 
+		#drawing.text((x1 + 15, y1 + 13 + 58 + 58), lines[2], font=font, fill="#000000")
 	return img
