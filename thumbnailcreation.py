@@ -1,11 +1,10 @@
-from ast import List
-from operator import truediv
-import os, locale
-from turtle import down
+import os
+import locale
 from typing import Dict
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 from datetime import timedelta
+from templates import classicBoxTemplate
 
 locale.setlocale(locale.LC_TIME, "de_DE")
 
@@ -28,6 +27,7 @@ class ThumbnailCreation:
 		"line3_font": "calibri",
 		"line3_text": "This is an example",
 		"logostatus": False,
+		"resize_logo": False,
 		"logopath": None,
 	}
 
@@ -293,5 +293,10 @@ def main() -> None:
 	#box1["line3_text"] = "Gemeinde Hamburg-Alstertal"
 	thumbnail.add_overlays(box1,{},{})
 
+def test():
+	t = classicBoxTemplate()
+	print(t.defaults)
+
 if __name__ == "__main__":
 	main()
+	
