@@ -1,7 +1,5 @@
 import os
-import locale
 from typing import Dict
-from urllib.parse import non_hierarchical
 from PIL import Image
 import templates
 
@@ -9,22 +7,29 @@ class ThumbnailCreation:
 	YTWIDTH: int = 1280  # Standardwith of Thumbnail
 	YTHEIGHT: int = 720  # Standardheight of Thumbnail
 	YTSIZE: int = 4000000 # Standard filesize for thumbnails
-	picpath: str
-	template: templates.Template
+	picpath: str # path to mainpicture
+	template: templates.Template #choosen template - default: classicBoxTemplate
+	resultname: str # Filename for the result without suffix
+	picending: str # suffix for the endresult
 	
-	def __init__(self, picpath, template):
+	def __init__(self, picpath, template=templates.classicBoxTemplate(), resultname=None, ending=None):
+		""" We need the path where to find the picture, the choosen template, 
+			the filename and the suffix for the endresult (NOT IN THE SAME ORDER)
+		"""
 		self.picpath = picpath
 		self.template = template
+		self.picending = ending
+		self.resultname = resultname
 
-	def run(self, data, resize_ending=None):
-		self.resize_pics(resize_ending)
+	def run(self, data):
+		""" Quickrun for thumbnail creation """
+		self.resize_pics()
 		self.add_overlays(data)
 		self.check_size()
 
-	def resize_pics(self, pic_ending=None):
+	def resize_pics(self):
 		""" Resizes the pic for the youtube format and aligns it to center if it is too large.
-		The new pic is saved as self.picpath with an added 2. Optional you can give an ending
-		in the variable picending. In the end self.picpath becomes the new safepath.
+		The pic is safed with the picending given in self.picending
 		"""
 		def scale(img, step):
 			""" Scales the with and height based on the step"""
@@ -59,12 +64,17 @@ class ThumbnailCreation:
 		path = os.path.split(self.picpath)
 		ending = path[1].split(".")
 		
-		if pic_ending:
-			ending[1] = pic_ending
+		if self.resultname:
+			ending[0] = self.resultname
+		else:
+			ending[0] += "1"
+		
+		if self.picending:
+			ending[1] = self.picending
 		else:
 			ending[1] = picformat
 		
-		savepath = os.path.join(path[0], "1.".join(ending))
+		savepath = os.path.join(path[0], ".".join(ending))
 		img.save(savepath, quality=100, format=ending[1])
 		self.picpath = savepath
 
@@ -87,8 +97,7 @@ class ThumbnailCreation:
 
 def example() -> None:
 	picpath = os.path.join("examples", "example.jpg")
-	thumbnail = ThumbnailCreation(picpath, templates.classicBoxTemplate())
-
+	thumbnail = ThumbnailCreation(picpath, resultname="Folie1", ending="png")
 	config = thumbnail.template.config
 	config["logo"]["activate"] = True
 	config["logo"]["logopath"] = os.path.join("examples", "logo.jpg")
@@ -98,7 +107,7 @@ def example() -> None:
 	config["image_1"]["imagepath"] = os.path.join("examples", "image_1.jpg")
 	config["image_2"]["activate"] = True
 	config["image_2"]["imagepath"] = os.path.join("examples", "image_2.jpg")
-	thumbnail.run(config, "png")
+	thumbnail.run(config)
 
 def main() -> None:
 	print("Welcome to thumbnail creation. For an example run the example() function.")
