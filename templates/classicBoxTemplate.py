@@ -2,9 +2,6 @@ from typing import Dict
 from .templateInterface import Template
 from .helpers import help_expand_image, help_shrink_image
 from PIL import Image, ImageDraw, ImageFont
-import os
-import datetime
-from datetime import timedelta
 
 class classicBoxTemplate(Template):
 	def __init__(self):
@@ -54,22 +51,28 @@ class classicBoxTemplate(Template):
 		self.config["section_2"]["default_box_width"] = 640
 		# Image 1
 		self.config["image_1"]["side"] = "right"
-		self.config["image_1"]["maximum_height"] = 150
+		self.config["image_1"]["maximum_height"] = 250
 		self.config["image_1"]["topmargin"] = 20
 		self.config["image_1"]["sidemargin"] = 20
+		# Image 2
+		self.config["image_2"]["side"] = "left"
+		self.config["image_2"]["maximum_height"] = 250
+		self.config["image_2"]["topmargin"] = 20
+		self.config["image_2"]["sidemargin"] = 80
+		self.config["image_2"]["bottommargin"] = 95
 		
 	def create_thumbnail(self, img: Image, data: Dict) -> Image:
-		# Set upper Box
 		if data["section_1"]["activate"]:
 			img = self.upper_box(img, data["section_1"], data["logo"])
 
 		if data["section_2"]["activate"]:
-			print("Section2")
 			img = self.down_box(img, data["section_2"])
 			
 		if data["image_1"]["activate"]:
-			print("Image 1")
 			img = self.add_picture_1(img, data["image_1"])
+
+		if data["image_2"]["activate"]:
+			img = self.add_picture_2(img, data["image_2"])
 		return img
 
 	def upper_box(self, img: Image, data: Dict, logodata: Dict) -> Image:
@@ -193,10 +196,10 @@ class classicBoxTemplate(Template):
 		
 		return img
 
-	def add_picture(self, img: Image, data: Dict) -> Image:
+	def add_picture_1(self, img: Image, data: Dict) -> Image:
 		pic = Image.open(data["imagepath"])
 		if pic.height > data["maximum_height"]:
-			pic = help_shrink_image(999999, data["maximum_height"])
+			pic = help_shrink_image(pic, 999999, data["maximum_height"])
 
 		if data["side"] == "left":
 			x = data["sidemargin"]
@@ -204,6 +207,22 @@ class classicBoxTemplate(Template):
 		else:
 			x = img.width - pic.width - data["sidemargin"]
 			y = data["topmargin"]
+		img.paste(pic, (x, y))
+
+		pic.close()
+		return img
+
+	def add_picture_2(self, img: Image, data: Dict) -> Image:
+		pic = Image.open(data["imagepath"])
+		if pic.height > data["maximum_height"]:
+			pic = help_shrink_image(pic, 999999, data["maximum_height"])
+
+		if data["side"] == "left":
+			x = data["sidemargin"]
+			y = img.height - pic.height - data["bottommargin"]
+		else:
+			x = img.width - pic.width - data["sidemargin"]
+			y = img.height - pic.height - data["bottommargin"]
 		img.paste(pic, (x, y))
 
 		pic.close()

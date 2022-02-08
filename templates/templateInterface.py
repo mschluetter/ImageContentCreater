@@ -16,12 +16,6 @@ class Template(ABC):
 			"line2_text": "This is Section2, Line2",
 			"line3_text": "This is Section2, Line3",
 			},
-		"section_3": {
-			"activate": False,
-			"line1_text": "This is Section3, Line1",
-			"line2_text": "This is Section3, Line2",
-			"line3_text": "This is Section3, Line3",
-			},
 		"logo": {
 			"activate": False,
 			"logopath": None,
