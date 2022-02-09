@@ -3,4 +3,4 @@ With this package you are able to create a thumbnail with some optional features
 # Classic Usage
 Let's assume we have a basic picture:<br />
 <img src="examples/example.jpg" width="70%" /><br />
-This picture is our base. We want to create 2 boxes with informations and add 2 images for video recommendation. To create
+This picture is our base. We want to create 2 boxes with informations and add 2 images for video recommendation.

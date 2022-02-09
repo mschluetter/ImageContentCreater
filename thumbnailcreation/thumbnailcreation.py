@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 from PIL import Image
-import templates
+import thumbnailcreation.templates as templates
 
 class ThumbnailCreation:
 	YTWIDTH: int = 1280  # Standardwith of Thumbnail
@@ -95,23 +95,8 @@ class ThumbnailCreation:
 			if quality < 5:
 				break
 
-def example() -> None:
-	picpath = os.path.join("examples", "example.jpg")
-	thumbnail = ThumbnailCreation(picpath, resultname="Folie1", ending="png")
-	config = thumbnail.template.config
-	config["logo"]["activate"] = True
-	config["logo"]["logopath"] = os.path.join("examples", "logo.jpg")
-	config["section_1"]["activate"] = True
-	config["section_2"]["activate"] = True
-	config["image_1"]["activate"] = True
-	config["image_1"]["imagepath"] = os.path.join("examples", "image_1.jpg")
-	config["image_2"]["activate"] = True
-	config["image_2"]["imagepath"] = os.path.join("examples", "image_2.jpg")
-	thumbnail.run(config)
-
 def main() -> None:
-	print("Welcome to thumbnail creation. For an example run the example() function.")
-	example()
+	print("Welcome to thumbnail creation.")
 	
 if __name__ == "__main__":
 	main()
