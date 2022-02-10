@@ -9,17 +9,15 @@ class ThumbnailCreation:
 	YTSIZE: int = 4000000 # Standard filesize for thumbnails
 	picpath: str # path to mainpicture
 	template: templates.Template #choosen template - default: classicBoxTemplate
-	resultname: str # Filename for the result without suffix
-	picending: str # suffix for the endresult
+	destination: str # Path to Destination
 	
-	def __init__(self, picpath, template=templates.classicBoxTemplate(), resultname=None, ending=None):
+	def __init__(self, picpath, destination=None, template=templates.classicBoxTemplate()):
 		""" We need the path where to find the picture, the choosen template, 
 			the filename and the suffix for the endresult (NOT IN THE SAME ORDER)
 		"""
 		self.picpath = picpath
 		self.template = template
-		self.picending = ending
-		self.resultname = resultname
+		self.destination = destination
 
 	def run(self, data):
 		""" Quickrun for thumbnail creation """
@@ -61,36 +59,30 @@ class ThumbnailCreation:
 		img = img.crop((pos1,pos2, self.YTWIDTH+pos1, self.YTHEIGHT+pos2))
 
 		# Build new Path and Safe new Pic, Set self.picpath
-		path = os.path.split(self.picpath)
-		ending = path[1].split(".")
-		
-		if self.resultname:
-			ending[0] = self.resultname
+		if self.destination == None:
+			path = os.path.split(self.picpath)
+			filename, suffix = path[1].split(".")
+			filename += "1"
 		else:
-			ending[0] += "1"
+			path = os.path.split(self.destination)
+			filename, suffix = path[1].split(".")
 		
-		if self.picending:
-			ending[1] = self.picending
-		else:
-			ending[1] = picformat
-		
-		savepath = os.path.join(path[0], ".".join(ending))
-		img.save(savepath, quality=100, format=ending[1])
-		self.picpath = savepath
+		self.destination = os.path.join(path[0], filename + "." + suffix)
+		img.save(self.destination, quality=100, format=suffix)
 
 	def add_overlays(self, data: Dict) -> None:
 		""" Sets the values for the chosen template"""
-		img = Image.open(self.picpath)
+		img = Image.open(self.destination)
 		img = self.template.create_thumbnail(img, data)
 		
-		img.save(self.picpath, quality=100)
+		img.save(self.destination, quality=100)
 
 	def check_size(self) -> None:
 		""" Checks the size of the file """
 		quality = 95
-		while os.stat(self.picpath).st_size > self.YTSIZE:
-			img = Image.open(self.picpath)
-			img.save(self.picpath, quality=quality)
+		while os.stat(self.destination).st_size > self.YTSIZE:
+			img = Image.open(self.destination)
+			img.save(self.destination, quality=quality)
 			quality -= 5
 			if quality < 5:
 				break

@@ -1,9 +1,10 @@
 import os
 from thumbnailcreation import ThumbnailCreation
 
-def example() -> None:
+def main():
 	picpath = os.path.join("examples", "example.jpg")
-	thumbnail = ThumbnailCreation(picpath, resultname="MYTEST", ending="png")
+	dst = os.path.join(os.getcwd(), "test.png")
+	thumbnail = ThumbnailCreation(picpath, dst)
 	config = thumbnail.template.config
 	config["logo"]["activate"] = True
 	config["logo"]["logopath"] = os.path.join("examples", "logo.jpg")
@@ -14,9 +15,6 @@ def example() -> None:
 	config["image_2"]["activate"] = True
 	config["image_2"]["imagepath"] = os.path.join("examples", "image_2.jpg")
 	thumbnail.run(config)
-
-def main():
-	example()
 	
 if __name__ == "__main__":
 	main()
