@@ -12,9 +12,9 @@ class ThumbnailCreation:
 	destination: str # Path to Destination
 	
 	def __init__(self, picpath, destination=None, template=templates.classicBoxTemplate()):
-		""" We need the path where to find the picture, the choosen template, 
-			the filename and the suffix for the endresult (NOT IN THE SAME ORDER)
-		"""
+		""" We need the path to the base image and optional the destination. The PIL module 
+			can handle common image formats. 
+			At last choose a template. The default is the classicBoxTemplate."""
 		self.picpath = picpath
 		self.template = template
 		self.destination = destination
@@ -43,7 +43,6 @@ class ThumbnailCreation:
 						return width, height
 		
 		img = Image.open(self.picpath)
-		picformat = img.format
 		# Check which side is longer and choose a step (up or down)
 		# else Statement if the YTWITH and YTHEIGHT is already good.
 		if img.width < self.YTWIDTH or img.height < self.YTHEIGHT:
@@ -69,10 +68,11 @@ class ThumbnailCreation:
 		
 		self.destination = os.path.join(path[0], filename + "." + suffix)
 		img.save(self.destination, quality=100, format=suffix)
+		self.picpath = self.destination
 
 	def add_overlays(self, data: Dict) -> None:
 		""" Sets the values for the chosen template"""
-		img = Image.open(self.destination)
+		img = Image.open(self.picpath)
 		img = self.template.create_thumbnail(img, data)
 		
 		img.save(self.destination, quality=100)
@@ -80,8 +80,8 @@ class ThumbnailCreation:
 	def check_size(self) -> None:
 		""" Checks the size of the file """
 		quality = 95
-		while os.stat(self.destination).st_size > self.YTSIZE:
-			img = Image.open(self.destination)
+		while os.stat(self.picpath).st_size > self.YTSIZE:
+			img = Image.open(self.picpath)
 			img.save(self.destination, quality=quality)
 			quality -= 5
 			if quality < 5:
