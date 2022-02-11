@@ -1,6 +1,6 @@
 from typing import Dict
 from .templateInterface import Template
-from .helpers import help_expand_image, help_shrink_image
+from .helpers import image_resize_helper, default_maximums_helper
 from PIL import Image, ImageDraw, ImageFont
 
 class classicBoxTemplate(Template):
@@ -62,6 +62,7 @@ class classicBoxTemplate(Template):
 		self.config["image_2"]["bottommargin"] = 95
 		
 	def create_thumbnail(self, img: Image, data: Dict) -> Image:
+		self.config = default_maximums_helper(img, self.config)
 		if data["section_1"]["activate"]:
 			img = self.upper_box(img, data["section_1"], data["logo"])
 
@@ -89,10 +90,7 @@ class classicBoxTemplate(Template):
 		# LogoWork
 		if logodata["activate"]:
 			logo = Image.open(logodata["logopath"])
-			if logo.height < logodata["minimum_height"]:
-				logo = help_expand_image(logo, 0, logodata["minimum_height"])
-			if logo.height > logodata["maximum_height"]:
-				logo = help_shrink_image(logo, 999999, logodata["maximum_height"])
+			logo = image_resize_helper(logodata, logo)
 			data["logospace"] = logo.width + 13
 			if logo.height > data["default_content_height"]:
 				data["default_content_height"] = logo.height
@@ -198,8 +196,7 @@ class classicBoxTemplate(Template):
 
 	def add_picture_1(self, img: Image, data: Dict) -> Image:
 		pic = Image.open(data["imagepath"])
-		if pic.height > data["maximum_height"]:
-			pic = help_shrink_image(pic, 999999, data["maximum_height"])
+		pic = image_resize_helper(data, pic)
 
 		if data["side"] == "left":
 			x = data["sidemargin"]
@@ -214,8 +211,7 @@ class classicBoxTemplate(Template):
 
 	def add_picture_2(self, img: Image, data: Dict) -> Image:
 		pic = Image.open(data["imagepath"])
-		if pic.height > data["maximum_height"]:
-			pic = help_shrink_image(pic, 999999, data["maximum_height"])
+		pic = image_resize_helper(data, pic)
 
 		if data["side"] == "left":
 			x = data["sidemargin"]

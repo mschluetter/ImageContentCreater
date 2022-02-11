@@ -27,6 +27,7 @@ def main():
 	config["image_2"]["activate"] = True
 	config["image_2"]["imagepath"] = os.path.join("examples", "image_2.jpg")
 	thumbnail.run(config)
-	
+
 if __name__ == "__main__":
 	main()
+	
