@@ -44,7 +44,7 @@ When you continue reading we make a deep dive throu the code. If you have any qu
 ## Imports
 We first import the needed modules.
 ```python
-import os
+import os # For os.path.join
 from thumbnailcreation import ThumbnailCreation
 import thumbnailcreation.templates as templates
 ```
