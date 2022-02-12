@@ -24,11 +24,14 @@ def shrink_image_helper(img: Image, max_width: int, max_height: int) -> Image:
     return img
 
 def image_resize_helper(imageconfig: Dict, img: Image) -> Image:
+    """ expands / shrinks the given image if needed."""
     img = expand_image_helper(img, imageconfig["minimum_width"], imageconfig["minimum_height"])
     img = shrink_image_helper(img, imageconfig["maximum_width"], imageconfig["maximum_height"])
     return img
 
 def default_maximums_helper(img: Image, config: Dict):
+    """ Set the default maximums on the images and logo
+    if the value is None."""
     width, height = img.size
     if config["logo"]["maximum_width"] == None:
         config["logo"]["maximum_width"] = width
