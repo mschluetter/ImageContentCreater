@@ -43,7 +43,7 @@ config: Dict = {
 			}
 		}
 ```
-This is the required configuration. When somebody wants to create a thumbnail, he/she can config this variables and the thumbnail has to look nice (customer service &#128521;). You can use the variables as you like. Best practice is when the customer wants to use an image or section he/she has to set "activate" to Ture. For images the path has to be added. The maximum sizes will be set later.
+This is the required configuration. When somebody wants to use a template he/she activates a section or an image and adds the linetexts. For images the path has to be added. This should be enough for a good looking result (customer service &#128521;). You as the designer have to take care about the minimum and maximum size. The maximum sizes will be set later (see "Little Helpers" section).
 ## Required methods
 You need to implement a constructor and a method named create_thumbnail. The constructor takes no arguments and is needed for the config extension. Place all extra config variables here.
 ```python

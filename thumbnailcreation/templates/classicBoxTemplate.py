@@ -5,6 +5,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 class classicBoxTemplate(Template):
 	def __init__(self):
+		self.config["order"] = ["section_1", "section_2", "image_1", "image_2"]
+		## SECTION_1
 		self.config["section_1"]["boxcolor"] = "#FFFFFF"
 		self.config["section_1"]["boxside"] = "left"
 		self.config["section_1"]["line1_color"]= "#000000"
@@ -25,10 +27,10 @@ class classicBoxTemplate(Template):
 		self.config["section_1"]["default_content_height"] = 94  # Default Content height without margin
 		self.config["section_1"]["default_box_width"] = 500
 		self.config["section_1"]["logospace"] = 0
-		# Logostuff
+		## LOGO
 		self.config["logo"]["minimum_height"] = 94
 		self.config["logo"]["maximum_height"] = 150
-		# Section 2
+		## SECTION 2
 		self.config["section_2"]["boxcolor"] = "#FFFFFF"
 		self.config["section_2"]["boxside"] = "right"
 		self.config["section_2"]["line1_color"]= "#000000"
@@ -49,12 +51,12 @@ class classicBoxTemplate(Template):
 		# minimum width and height
 		self.config["section_2"]["default_content_height"] = 166  # Default Content height without margin
 		self.config["section_2"]["default_box_width"] = 640
-		# Image 1
+		## IMAGE_1
 		self.config["image_1"]["side"] = "right"
 		self.config["image_1"]["maximum_height"] = 250
 		self.config["image_1"]["topmargin"] = 20
 		self.config["image_1"]["sidemargin"] = 20
-		# Image 2
+		## IMAGE_2
 		self.config["image_2"]["side"] = "left"
 		self.config["image_2"]["maximum_height"] = 250
 		self.config["image_2"]["topmargin"] = 20
@@ -63,17 +65,17 @@ class classicBoxTemplate(Template):
 		
 	def create_thumbnail(self, img: Image, data: Dict) -> Image:
 		self.config = default_maximums_helper(img, self.config)
-		if data["section_1"]["activate"]:
-			img = self.upper_box(img, data["section_1"], data["logo"])
-
-		if data["section_2"]["activate"]:
-			img = self.down_box(img, data["section_2"])
-			
 		if data["image_1"]["activate"]:
 			img = self.add_picture_1(img, data["image_1"])
 
 		if data["image_2"]["activate"]:
 			img = self.add_picture_2(img, data["image_2"])
+
+		if data["section_1"]["activate"]:
+			img = self.upper_box(img, data["section_1"], data["logo"])
+
+		if data["section_2"]["activate"]:
+			img = self.down_box(img, data["section_2"])
 		return img
 
 	def upper_box(self, img: Image, data: Dict, logodata: Dict) -> Image:
