@@ -1,5 +1,6 @@
 # Youtube Thumbnail Creator
-With this package you are able to create a youtube thumbnail with some optional features. We use the pillow lirbary for the creation. I made a standard template which is used in a youtube channel for streams. If needed you can add more templates with the templates module (more information down below). First we concentrate on the common usecase. This is the general usage. For the template documentation you can browse the folder <strong>template_documentation</strong>. At the moment I created one template. I hope I can add more templates over time. 
+With this package you are able to create a youtube thumbnail with some optional features. We use the pillow lirbary for the creation. I made a standard template which is used in a youtube channel for streams. If needed you can add more templates with the templates module (more information down below). First we concentrate on the common usecase. This is the general usage. For the explenation for the classicBoxTemplate you can click <a href="template_documentation/classicBoxTemplate/classicBoxTemplate.md">Here</a>. <br />
+If you want to learn more about templates in general you can click <a href="template_documentation/about_creating_templates.md">Here</a>.
 # Quick Walkthrouh
 Let's assume we have a basic image:<br />
 <img src="examples/example.jpg" width="50%" /><br />
@@ -98,7 +99,7 @@ config["image_2"]["imagepath"] = os.path.join("examples", "image_2.jpg")
 The creating process is doing a few things:
 <ul>
     <li><strong>Resizing the Image to the requested format</strong><br />
-    The standard Youtube thumbnail size is 1280 * 720. This method resizes the image. If needed it crops the right size in the center. Afterwards the right destination path is calculated.</li>
+    The standard Youtube thumbnail size is 1280 * 720. This method resizes the image. If needed it crops the right size in the center. Afterwards the right destination path is calculated. If you want ti change the thumbnail size you can change the class variables YTWIDTH and YTHEIGHT.</li>
     <li><strong>Add overlays</strong><br />
     This method calls the create_thumbnail method of the template. It requires the configuration</li>
     <li><strong>Check Size</strong><br />

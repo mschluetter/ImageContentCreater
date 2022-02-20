@@ -4,7 +4,7 @@ import thumbnailcreation.templates as templates
 
 def main():
 	picpath = os.path.join("examples", "example.jpg")
-	dst = os.path.join("examples", "mycoolthumbnail.png")
+	dst = os.path.join("examples", "mycoolthumbnail.jpg")
 	template = templates.classicBoxTemplate()
 	thumbnail = ThumbnailCreation(picpath, dst, template)
 

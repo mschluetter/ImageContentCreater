@@ -67,7 +67,8 @@ class ThumbnailCreation:
 			filename, suffix = path[1].split(".")
 		
 		self.destination = os.path.join(path[0], filename + "." + suffix)
-		img.save(self.destination, quality=100, format=suffix)
+		if suffix.upper() == "JPG": suffix = "JPEG"
+		img.save(self.destination, quality=95, format=suffix, subsampling=0)
 		self.picpath = self.destination
 
 	def add_overlays(self, data: Dict) -> None:
@@ -79,13 +80,14 @@ class ThumbnailCreation:
 
 	def check_size(self) -> None:
 		""" Checks the size of the file """
-		quality = 95
-		while os.stat(self.picpath).st_size > self.YTSIZE:
-			img = Image.open(self.picpath)
-			img.save(self.destination, quality=quality)
-			quality -= 5
-			if quality < 5:
-				break
+		quality = 90
+		if self.picpath.endswith("jpg"):
+			while os.stat(self.picpath).st_size > self.YTSIZE:
+				img = Image.open(self.picpath)
+				img.save(self.destination, quality=quality)
+				quality -= 5
+				if quality < 5:
+					break
 
 def main() -> None:
 	print("Welcome to thumbnail creation.")
